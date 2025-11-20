@@ -42,7 +42,7 @@
         *   **Method 2 (Network Scan):** Use a tool like `nmap` (`nmap -sn 192.168.1.0/24`) or a phone app to scan the network.
 5. **Install requirements**
 ```
-apt-get install openssh-server curl nginx
+apt-get install openssh-server curl nginx apt-transport-https gpg git
 
 ```
 ---
@@ -78,6 +78,24 @@ apt-get install openssh-server curl nginx
     *   Run the tunnel, pointing it to the Nginx service: `cloudflared tunnel run --url localhost:80 my-pi-tunnel-1`.
 
 3.  **Verification:** Students can now access `https://pi-1.my-pi-workshop.com` from any device on the internet and see their page. This is a huge "wow" moment.
+
+CloudflareD installation:
+```
+# Add cloudflare gpg key
+sudo mkdir -p --mode=0755 /usr/share/keyrings
+curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v2.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v2.gpg >/dev/null
+
+# Add this repo to your apt repositories
+echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+
+# install cloudflared
+sudo apt-get update && sudo apt-get install cloudflared
+```
+
+CloudflareD registration:
+```
+sudo cloudflared service install eyJhIjoiZTFlYzQwNTdhYWI0MGVkOTNiNTYwNGU3MTBmZjA0ZGMiLCJ0IjoiZWQ3NzAwNjQtYjdlMi00NzNiLWJhYjMtODUyNzU2YmNmNTU3IiwicyI6Ik9EUmxOamc0WVdZdE16Rm1OaTAwTWpCbUxXSm1OekV0WmpjMFpUVTBPVGN3T1RabCJ9
+```
 
 ---
 
@@ -131,6 +149,25 @@ apt-get install openssh-server curl nginx
 
     *   **Code Change:** Modify the Python app on **all three Pis** to save and read photos from `/mnt/shared_photos`.
 
+```
+curl -s https://syncthing.net/release-key.txt | gpg --dearmor | sudo tee /usr/share/keyrings/syncthing-archive-keyring.gpg >/dev/null
+
+echo "deb [signed-by=/usr/share/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable" | sudo tee /etc/apt/sources.list.d/syncthing.list
+
+apt-get update
+
+apt-get install syncthing -y
+```
+
+Configure:
+```
+systemctl enable syncthing@pi.service
+systemctl start syncthing@pi.service
+systemctl stop syncthing@pi.service
+sed -i "s/127.0.0.1:8384/0.0.0.0:8384/g" .local/state/syncthing/config.xml
+systemctl start syncthing@pi.service
+mkdir -p /mnt/photos
+```
 2.  **Concept 2: Automatic Failover.** We need one domain that intelligently sends users to a *working* server.
     *   **Action (in Cloudflare Dashboard):**
         *   Create a single new DNS `A` record (e.g., `photos.my-pi-workshop.com`) and point it to a dummy IP like `192.0.2.1`.
