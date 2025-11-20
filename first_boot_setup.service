@@ -1,0 +1,12 @@
+[Unit]
+Description=First Boot Setup Script
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/first_boot_setup.sh
+RemainAfterExit=yes
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target
