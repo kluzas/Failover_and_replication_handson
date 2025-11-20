@@ -113,6 +113,11 @@ sudo cloudflared service install eyJhIjoiZTFlYzQwNTdhYWI0MGVkOTNiNTYwNGU3MTBmZjA
 
 3.  **Interaction:** Students can now visit their unique URL, upload a photo, and see it in the gallery.
 
+```
+apt-get install python3-pip
+pip3 install -r requirements.txt --break-system-packages
+```
+
 ---
 
 ### Part 5: Demonstrating the Single Point of Failure (15 mins)
